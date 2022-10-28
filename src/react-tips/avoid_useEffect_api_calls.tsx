@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-
+import { useQuery } from '@tanstack/react-query'
 
 /* 
 	Reasons to avoid api calls in useEffect.
@@ -44,4 +44,42 @@ export const ApiCalls = () => {
 	return (
 		<div>avoid_useEffect_api_calls</div>
 	);
+}
+
+/* 
+	Comparison fetch with other tools 
+
+	1. now you see start fetching is before mounted component. (*)
+	2. You can use react query like a global store too.
+*/
+
+export const ApiCallsWithReactQuery = () => {
+
+	const url = 'https://api.escuelajs.co/api/v1/products';
+	const { isLoading, error , data} = useQuery(['products'],getProducts);
+
+	async function getProducts() {
+		try {
+			console.log('Start Fetching React Query'); //*
+			const response = await fetch(url);
+			const responseJson: any[] = await response.json();
+			return responseJson
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	useEffect(() => {
+		console.log('Component Mounted React Query');
+	}, []);
+
+	if(isLoading) return <>Loading....</>;
+
+	if(error) return <>{error}</>
+	
+	console.log(data);
+	return (
+		<div>query cliente fetch</div>
+	);
+
 }
